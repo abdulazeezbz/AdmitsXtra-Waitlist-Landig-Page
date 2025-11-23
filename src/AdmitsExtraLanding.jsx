@@ -60,7 +60,7 @@ const App = () => {
       await push(waitlistRef, { email, joinedAt: Date.now() });
 
 
-      await fetch("./functions/sendMail.js", {
+      await fetch("/api/sendMail.js", {
   method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({ email }),

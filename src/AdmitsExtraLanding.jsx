@@ -32,6 +32,7 @@ const App = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [email, setEmail] = useState('');
+  const [error, setError] = useState('');
   const [joined, setJoined] = useState(false);
 
   // Handle Scroll Effect for Navbar
@@ -42,32 +43,37 @@ const App = () => {
   }, []);
 
   // Handle Form Submission
-const handleJoin = async (e) => {
-  e.preventDefault();
-  if (!email) return;
+ const handleJoin = async (e) => {
+    e.preventDefault();
+    if (!email) return;
 
-  try {
-    const waitlistRef = ref(database, "waitlist");
+    try {
+      const waitlistRef = ref(database, "waitlist");
+      const emailQuery = query(waitlistRef, orderByChild("email"), equalTo(email));
+      const snapshot = await get(emailQuery);
 
-    // Check for duplicates
-    const emailQuery = query(waitlistRef, orderByChild("email"), equalTo(email));
-    const snapshot = await get(emailQuery);
+      if (snapshot.exists()) {
+        setError("This email is already in the waitlist!");
+        return;
+      }
 
-    if (snapshot.exists()) {
-      alert("This email is already in the waitlist!");
-      return;
+      await push(waitlistRef, { email, joinedAt: Date.now() });
+
+
+      await fetch("./functions/sendMail.js", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ email }),
+});
+
+      setJoined(true);
+      setEmail("");
+      setError("");
+    } catch (err) {
+      console.error("Error adding to Firebase:", err);
+      setError("Something went wrong. Please try again.");
     }
-
-    // Add new email
-    await push(waitlistRef, { email, joinedAt: Date.now() });
-
-    setJoined(true);
-    setEmail("");
-
-  } catch (error) {
-    console.error("Error adding to Firebase:", error);
-  }
-};
+  };
 
 
    const images = [AppShot1, AppShot2, AppShot3]; // Add as many images as you want
@@ -1024,10 +1030,11 @@ const handleJoin = async (e) => {
                         onChange={(e) => setEmail(e.target.value)}
                       />
                     </div>
-                    
+                    {error && <p className="text-red-500 mt-2">{error}</p>}
                     <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>
                       Join Waitlist Now
                     </button>
+
                     <p style={{textAlign: 'center', fontSize: '0.8rem', color: '#94a3b8', marginTop: '15px'}}>
                       No spam. Unsubscribe anytime.
                     </p>

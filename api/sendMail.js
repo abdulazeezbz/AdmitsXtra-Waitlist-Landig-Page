@@ -6,7 +6,6 @@ export default async function handler(req, res) {
   }
 
   const { email } = req.body;
-
   if (!email) return res.status(400).send("Email required");
 
   const transporter = nodemailer.createTransport({
@@ -24,109 +23,41 @@ export default async function handler(req, res) {
       from: `"Admits Extra" <noreplay@umojamarkets.com>`,
       to: email,
       subject: "🎉 Welcome to Admits Extra! Your Early Access Awaits",
-  html: `
-  <html>
-  <head>
-    <style>
-      :root {
-        --primary: #6366f1;
-        --primary-dark: #4338ca;
-        --secondary: #ec4899;
-        --accent: #8b5cf6;
-        --dark: #0f172a;
-        --light: #f8fafc;
-        --text-dark: #1e293b;
-        --text-light: #64748b;
-        --white: #ffffff;
-        --gradient: linear-gradient(135deg, #6366f1 0%, #57f542 100%);
-      }
+      html: `
+      <html>
+        <body style="margin:0; padding:0; font-family: 'Helvetica', Arial, sans-serif; background-color:#f8fafc; color:#1e293b;">
+          <div style="max-width:600px; margin:40px auto; background:#ffffff; border-radius:12px; box-shadow:0 8px 20px rgba(0,0,0,0.1); border:1px solid rgba(99,102,241,0.3); overflow:hidden;">
+            
+            <!-- Header -->
+            <div style="background:linear-gradient(135deg, #6366f1 0%, #ec4899 100%); color:#fff; text-align:center; padding:40px 20px;">
+              <h1 style="margin:0; font-size:28px;">Welcome to Admits Extra 🎉</h1>
+            </div>
+            
+            <!-- Content -->
+            <div style="padding:30px 20px; text-align:center;">
+              <p style="font-size:16px; margin:10px 0;">Hi there!</p>
+              <p style="font-size:16px; line-height:1.5; margin:15px 0;">
+                Thanks for joining our waitlist. You're now part of a growing community that discovers deals, attends events, shares coupons, and builds amazing experiences!
+              </p>
+              <a href="https://admitsextra.app" 
+                 style="display:inline-block; background:#6366f1; color:#ffffff; text-decoration:none; padding:14px 36px; border-radius:8px; font-weight:bold; margin-top:20px; box-shadow:0 4px 15px rgba(99,102,241,0.3);">
+                 Get Early Access
+              </a>
+            </div>
 
-      body {
-        font-family: 'Helvetica', Arial, sans-serif;
-        background: var(--light);
-        color: var(--text-dark);
-        margin: 0;
-        padding: 0;
-      }
+            <!-- Footer -->
+            <div style="padding:20px; font-size:12px; color:#64748b; text-align:center; background:#f1f5f9;">
+              You received this email because you signed up for Admits Extra.<br/>
+              © ${new Date().getFullYear()} Admits Extra. All rights reserved.
+            </div>
 
-      .container {
-        max-width: 600px;
-        margin: 40px auto;
-        background: var(--white);
-        border-radius: 12px;
-        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-        overflow: hidden;
-        border: 1px solid rgba(99, 102, 241, 0.3);
-      }
-
-      .header {
-        background: var(--gradient);
-        color: var(--white);
-        padding: 40px 20px;
-        text-align: center;
-      }
-
-      .header h1 {
-        margin: 0;
-        font-size: 28px;
-      }
-
-      .content {
-        padding: 30px 20px;
-        text-align: center;
-      }
-
-      .content p {
-        font-size: 16px;
-        line-height: 1.5;
-        margin: 15px 0;
-      }
-
-      .btn {
-        display: inline-block;
-        background: var(--primary);
-        color: var(--white);
-        text-decoration: none;
-        padding: 12px 30px;
-        border-radius: 8px;
-        font-weight: bold;
-        margin-top: 20px;
-        box-shadow: 0 4px 15px rgba(99,102,241,0.3);
-      }
-
-      .footer {
-        padding: 20px;
-        font-size: 12px;
-        color: var(--text-light);
-        text-align: center;
-      }
-
-      @media (max-width: 500px) {
-        .container { margin: 20px; }
-        .header h1 { font-size: 24px; }
-      }
-    </style>
-  </head>
-  <body>
-    <div class="container">
-      <div class="header">
-        <h1>Welcome to Admits Extra 🎉</h1>
-      </div>
-      <div class="content">
-        <p>Hi there!</p>
-        <p>Thanks for joining our waitlist. You're now part of a growing community that discovers deals, attends events, shares coupons, and builds amazing experiences!</p>
-        <a href="https://admitsextra.app" class="btn">Get Early Access</a>
-      </div>
-      <div class="footer">
-        You received this email because you signed up for Admits Extra. <br>
-        © ${new Date().getFullYear()} Admits Extra. All rights reserved.
-      </div>
-    </div>
-  </body>
-  </html>
-  `,
-      text: "Thanks for joining our waitlist!",
+          </div>
+        </body>
+      </html>
+      `,
+      text: "Thanks for joining our waitlist! Visit https://admitsextra.app for early access.",
     });
+
     return res.status(200).json({ success: true });
   } catch (err) {
     console.error(err);

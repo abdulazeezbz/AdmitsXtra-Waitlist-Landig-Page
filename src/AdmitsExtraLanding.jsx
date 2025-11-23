@@ -31,7 +31,33 @@ import appIcon from './assets/logo.PNG'
 const App = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [email, setEmail] = useState('');
+  
+
+  const [userType, setUserType] = useState(""); // "individual" or "business"
+
+  // Individual Fields
+  const [fullName, setFullName] = useState("");
+  const [gender, setGender] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [whatsapp, setWhatsapp] = useState("");
+  const [address, setAddress] = useState("");
+  const [description, setDescription] = useState("");
+
+  // Business Fields
+  const [businessName, setBusinessName] = useState("");
+  const [businessAddress, setBusinessAddress] = useState("");
+  const [principalActivity, setPrincipalActivity] = useState("");
+  const [businessEmail, setBusinessEmail] = useState("");
+  const [businessPhone, setBusinessPhone] = useState("");
+  const [repName, setRepName] = useState("");
+  const [repGender, setRepGender] = useState("");
+  const [repEmail, setRepEmail] = useState("");
+  const [repPhone, setRepPhone] = useState("");
+  const [repAddress, setRepAddress] = useState("");
+  const [repPosition, setRepPosition] = useState("");
+
+
   const [error, setError] = useState('');
   const [joined, setJoined] = useState(false);
 
@@ -42,38 +68,117 @@ const App = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Handle Form Submission
- const handleJoin = async (e) => {
-    e.preventDefault();
-    if (!email) return;
-
-    try {
-      const waitlistRef = ref(database, "waitlist");
-      const emailQuery = query(waitlistRef, orderByChild("email"), equalTo(email));
-      const snapshot = await get(emailQuery);
-
-      if (snapshot.exists()) {
-        setError("This email is already in the waitlist!");
-        return;
-      }
-
-      await push(waitlistRef, { email, joinedAt: Date.now() });
 
 
-      await fetch("/api/sendMail.js", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ email }),
-});
 
-      setJoined(true);
-      setEmail("");
-      setError("");
-    } catch (err) {
-      console.error("Error adding to Firebase:", err);
-      setError("Something went wrong. Please try again.");
+// Handle Form Submission
+const handleJoin = async (e) => {
+  e.preventDefault();
+
+  // Basic validation
+  if (!userType) {
+    setError("Please select Individual or Business");
+    return;
+  }
+
+  if (userType === "individual" && !email) {
+    setError("Email is required for Individual");
+    return;
+  }
+
+  if (userType === "business" && !businessEmail) {
+    setError("Business Email is required");
+    return;
+  }
+
+  try {
+    const waitlistRef = ref(database, "waitlist");
+
+    // Check if the email already exists
+    const emailToCheck = userType === "individual" ? email : businessEmail;
+    const emailQuery = query(waitlistRef, orderByChild("email"), equalTo(emailToCheck));
+    const snapshot = await get(emailQuery);
+
+    if (snapshot.exists()) {
+      setError("This email is already in the waitlist!");
+      return;
     }
-  };
+
+    // Build data object
+    let data;
+
+    if (userType === "individual") {
+      data = {
+        userType,
+        email,          // Individual email
+        joinedAt: Date.now(),
+        fullName,
+        gender,
+        phone,
+        whatsapp,
+        address,
+        description,
+      };
+    } else if (userType === "business") {
+      data = {
+        userType,
+        email: businessEmail,   // Business email
+        joinedAt: Date.now(),
+        businessName,
+        businessAddress,
+        principalActivity,
+        businessEmail,
+        businessPhone,
+        representative: {
+          name: repName,
+          gender: repGender,
+          email: repEmail,
+          phone: repPhone,
+          address: repAddress,
+          position: repPosition,
+        },
+      };
+    }
+
+    // Push to Firebase
+    await push(waitlistRef, data);
+
+    // Optional: send confirmation email
+    await fetch("/api/sendMail.js", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: emailToCheck }),
+    });
+
+    setJoined(true);
+    setError("");
+
+    // Reset all fields
+    setFullName("");
+    setGender("");
+    setPhone("");
+    setWhatsapp("");
+    setAddress("");
+    setDescription("");
+    setBusinessName("");
+    setBusinessAddress("");
+    setPrincipalActivity("");
+    setBusinessEmail("");
+    setBusinessPhone("");
+    setRepName("");
+    setRepGender("");
+    setRepEmail("");
+    setRepPhone("");
+    setRepAddress("");
+    setRepPosition("");
+    setEmail("");
+    setUserType("");
+
+  } catch (err) {
+    console.error("Error adding to Firebase:", err);
+    setError("Something went wrong. Please try again.");
+  }
+};
 
 
    const images = [AppShot1, AppShot2, AppShot3]; // Add as many images as you want
@@ -1002,57 +1107,125 @@ const App = () => {
 
         {/* Waitlist Section */}
         <section id="waitlist" className="waitlist">
-          <div className="container">
-            <div className="waitlist-container">
-              <div className="waitlist-visual">
-                 <div style={{position: 'relative', zIndex: 2}}>
-                   <h3 style={{ fontSize: '2.5rem', marginBottom: '15px', fontWeight: '800' }}>Join the<br/>Movement.</h3>
-                   <p style={{ opacity: 0.9, fontSize: '1.1rem' }}>Secure your unique username and get 3 months of premium features for free when we launch.</p>
-                 </div>
-              </div>
-              
-              <div className="waitlist-form-wrapper">
-                {!joined ? (
-                  <form onSubmit={handleJoin}>
-                    <h3 style={{ fontSize: '2rem', marginBottom: '10px', fontWeight: '800', color: 'var(--text-dark)' }}>Get Early Access</h3>
-                    <p style={{ color: 'var(--text-light)', marginBottom: '30px' }}>
-                      We are opening up spots in batches. Enter your email to reserve your spot in line.
-                    </p>
-                    
-                    <div style={{marginBottom: '20px'}}>
-                      <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '0.9rem', color: '#475569' }}>Email Address</label>
-                      <input 
-                        type="email" 
-                        className="input-field" 
-                        placeholder="alex@example.com" 
-                        required
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                      />
-                    </div>
-                    {error && <p className="text-red-500 mt-2">{error}</p>}
-                    <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>
-                      Join Waitlist Now
-                    </button>
-
-                    <p style={{textAlign: 'center', fontSize: '0.8rem', color: '#94a3b8', marginTop: '15px'}}>
-                      No spam. Unsubscribe anytime.
-                    </p>
-                  </form>
-                ) : (
-                  <div className="success-message">
-                    <div className="success-icon">
-                      <Check size={32} />
-                    </div>
-                    <h3 style={{ fontSize: '1.8rem', marginBottom: '10px', fontWeight: '700' }}>You're in!</h3>
-                    <p style={{ color: 'var(--text-light)' }}>We've sent a confirmation email to <strong>{email || 'your inbox'}</strong>. Keep an eye out for updates!</p>
-                    <button onClick={() => setJoined(false)} style={{marginTop: '20px', color: 'var(--primary)', background: 'none', border: 'none', fontWeight: '600', cursor: 'pointer'}}>Register another email</button>
-                  </div>
-                )}
-              </div>
+      <div className="container">
+        <div className="waitlist-container">
+          <div className="waitlist-visual">
+            <div style={{ position: "relative", zIndex: 2 }}>
+              <h3 style={{ fontSize: "2.5rem", marginBottom: "15px", fontWeight: "800" }}>
+                Join the<br />Movement.
+              </h3>
+              <p style={{ opacity: 0.9, fontSize: "1.1rem" }}>
+                Secure your unique username and get 3 months of premium features for free when we launch.
+              </p>
             </div>
           </div>
-        </section>
+
+          <div className="waitlist-form-wrapper">
+            {!joined ? (
+              <form onSubmit={handleJoin}>
+                <h3 style={{ fontSize: "2rem", marginBottom: "10px", fontWeight: "800", color: "var(--text-dark)" }}>
+                  Get Early Access
+                </h3>
+                <p style={{ color: "var(--text-light)", marginBottom: "30px" }}>
+                  We are opening up spots in batches. Fill in your details to reserve your spot in line.
+                </p>
+
+                {/* Select User Type */}
+                <div style={{ marginBottom: "20px" }}>
+                  <label style={{ fontWeight: 600, marginBottom: 5, display: "block" }}>I'm joining as:</label>
+                  <select
+                    value={userType}
+                    onChange={(e) => setUserType(e.target.value)}
+                    required
+                    className="input-field"
+                     >
+                    <option value="">Select</option>
+                    <option value="individual">Individual</option>
+                    <option value="business">Business</option>
+                  </select>
+                </div>
+
+                {/* Individual Form */}
+                {userType === "individual" && (
+                  <>
+                    <input className="input-field" style={{marginTop:8}} placeholder="Full Name" value={fullName} onChange={(e) => setFullName(e.target.value)} required />
+                   <label>Gender:</label>
+                    <div className="input-field">
+                      
+                        <input style={{marginTop:8}} type="radio" name="gender" value="male" checked={gender === "male"} onChange={(e) => setGender(e.target.value)} /> 
+                 &nbsp;Male &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <input style={{marginTop:8}} type="radio" name="gender" value="female" checked={gender === "female"} onChange={(e) => setGender(e.target.value)} /> 
+                        &nbsp;Female
+                      
+                    </div>
+
+
+                    <input
+      className="input-field"
+      style={{ marginTop: 8 }}
+      placeholder="Email"
+      type="email"
+      value={email}         // <-- bind email state
+      onChange={(e) => setEmail(e.target.value)}
+      required
+    />
+                    <input className="input-field" style={{marginTop:8}} placeholder="Phone Number" value={phone} onChange={(e) => setPhone(e.target.value)} required />
+                    <input className="input-field" style={{marginTop:8}} placeholder="Whatsapp Number" value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} />
+                    <input className="input-field" style={{marginTop:8}} placeholder="Address" value={address} onChange={(e) => setAddress(e.target.value)} />
+                    <textarea style={{marginTop:8}} className="input-field" placeholder="Brief description of usage" value={description} onChange={(e) => setDescription(e.target.value)} />
+                  </>
+                )}
+
+                {/* Business Form */}
+                {userType === "business" && (
+                  <>
+                    <input className="input-field" style={{marginTop:8}} placeholder="Business Name" value={businessName} onChange={(e) => setBusinessName(e.target.value)} required />
+                    <input className="input-field" style={{marginTop:8}} placeholder="Business Address" value={businessAddress} onChange={(e) => setBusinessAddress(e.target.value)} required />
+                    <input className="input-field" style={{marginTop:8}} placeholder="Principal Activity of Business" value={principalActivity} onChange={(e) => setPrincipalActivity(e.target.value)} required />
+                    <input className="input-field" style={{marginTop:8}} placeholder="Business Email" value={businessEmail} onChange={(e) => setBusinessEmail(e.target.value)} required />
+                    <input className="input-field" style={{marginTop:8}} placeholder="Business Phone" value={businessPhone} onChange={(e) => setBusinessPhone(e.target.value)} required />
+                    <h4>Representative Info</h4>
+                    <input className="input-field" style={{marginTop:8}} placeholder="Name" value={repName} onChange={(e) => setRepName(e.target.value)} required />
+                    
+                    <label>Gender:</label>
+                    <div className="input-field">
+                      
+                     
+                        <input style={{marginTop:8, marginRigh:10}} type="radio" name="repGender" value="male" checked={repGender === "male"} onChange={(e) => setRepGender(e.target.value)} /> 
+                        &nbsp;Male &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <input style={{marginTop:8, marginRigh:10}} type="radio" name="repGender" value="female" checked={repGender === "female"} onChange={(e) => setRepGender(e.target.value)} /> 
+                        &nbsp;Female
+                      
+                    </div>
+                    <input className="input-field" style={{marginTop:8}} placeholder="Email" 
+                    value={repEmail} onChange={(e) => setRepEmail(e.target.value)} required />
+                    <input className="input-field" style={{marginTop:8}} placeholder="Phone" value={repPhone} onChange={(e) => setRepPhone(e.target.value)} required />
+                    <input className="input-field" style={{marginTop:8}} placeholder="Address" value={repAddress} onChange={(e) => setRepAddress(e.target.value)} />
+                    <input className="input-field" style={{marginTop:8}} placeholder="Position" value={repPosition} onChange={(e) => setRepPosition(e.target.value)} required />
+                  </>
+                )}
+
+                {error && <p className="text-red-500 mt-2">{error}</p>}
+                <br />
+                <br />
+                <button type="submit" className="btn btn-primary" style={{ width: "100%" }}>
+                  Join Waitlist Now
+                </button>
+              </form>
+            ) : (
+              <div className="success-message">
+                <div className="success-icon">
+                  <Check size={32} />
+                </div>
+                <h3 style={{ fontSize: "1.8rem", marginBottom: "10px", fontWeight: "700" }}>You're in!</h3>
+                <p style={{ color: "var(--text-light)" }}>We've sent a confirmation email to <strong>{email || "your inbox"}</strong>. Keep an eye out for updates!</p>
+                <button onClick={() => setJoined(false)} style={{ marginTop: "20px", color: "var(--primary)", background: "none", border: "none", fontWeight: "600", cursor: "pointer" }}>Register another email</button>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </section>
 
         {/* Footer */}
         <footer className="footer">

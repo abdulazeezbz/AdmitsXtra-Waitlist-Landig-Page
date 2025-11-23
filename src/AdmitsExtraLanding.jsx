@@ -32,6 +32,7 @@ const App = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   
+  const [isloading, setIsLoading] = useState(false);
 
   const [userType, setUserType] = useState(""); // "individual" or "business"
 
@@ -74,6 +75,7 @@ const App = () => {
 // Handle Form Submission
 const handleJoin = async (e) => {
   e.preventDefault();
+   setIsLoading(true);
 
   // Basic validation
   if (!userType) {
@@ -101,6 +103,7 @@ const handleJoin = async (e) => {
 
     if (snapshot.exists()) {
       setError("This email is already in the waitlist!");
+      setIsLoading(false);
       return;
     }
 
@@ -173,8 +176,9 @@ const handleJoin = async (e) => {
     setRepPosition("");
     setEmail("");
     setUserType("");
-
+setIsLoading(false);
   } catch (err) {
+    setIsLoading(false);
     console.error("Error adding to Firebase:", err);
     setError("Something went wrong. Please try again.");
   }
@@ -196,6 +200,21 @@ const handleJoin = async (e) => {
     <>
       {/* --- STANDARD CSS STYLES --- */}
       <style>{`
+
+      .spinner {
+  width: 20px;
+  height: 20px;
+  border: 3px solid #fff;
+  border-top: 3px solid transparent;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
         :root {
           --primary: #6366f1; /* Indigo */
           --primary-dark: #4338ca;
@@ -1209,7 +1228,11 @@ const handleJoin = async (e) => {
                 <br />
                 <br />
                 <button type="submit" className="btn btn-primary" style={{ width: "100%" }}>
-                  Join Waitlist Now
+                  {isloading ? (
+    <div className="spinner" />
+  ) : (
+    "Join Waitlist Now"
+  )}
                 </button>
               </form>
             ) : (

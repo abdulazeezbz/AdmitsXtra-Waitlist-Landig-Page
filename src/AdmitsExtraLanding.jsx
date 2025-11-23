@@ -24,7 +24,7 @@ import AppShot1 from "./assets/ScreenshotGo.jpg";
 import AppShot2 from "./assets/screenshot2.png";
 import AppShot3 from "./assets/screenshot1.jpg";
 
-import appIcon from './assets/logo.png'
+import appIcon from './assets/logo.PNG'
 
 
 

@@ -15,6 +15,12 @@ import {
 } from 'lucide-react';
 
 
+import { Cpu, 
+  Code,
+   Zap, 
+   Globe,
+   } from 'lucide-react';
+
 import { database } from "./firebase"; // ✅ import your database
 
 import { ref, push, get, query, orderByChild, equalTo } from "firebase/database"; // ✅ import DB helpers from firebase/database
@@ -874,6 +880,9 @@ setIsLoading(false);
             width: 100%;
           }
         }
+
+
+        
       `}</style>
 
       {/* --- COMPONENT JSX --- */}
@@ -1246,6 +1255,69 @@ setIsLoading(false);
               </div>
             )}
           </div>
+        </div>
+      </div>
+    </section>
+
+ <section className="relative w-full bg-slate-950 py-24 overflow-hidden border-t border-slate-900">
+      
+      {/* Background Gradients/Glows */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+        <div className="absolute top-[-20%] left-[20%] w-[500px] h-[500px] bg-purple-600/20 rounded-full blur-[120px] mix-blend-screen animate-pulse"></div>
+        <div className="absolute bottom-[-20%] right-[20%] w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[120px] mix-blend-screen"></div>
+      </div>
+
+      <div className="container mx-auto px-4 relative z-10">
+        <div className="flex flex-col items-center justify-center text-center">
+          
+          {/* Logo Placeholder Area */}
+          <div className="group relative mb-10">
+            {/* Outer Glow */}
+            <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-2xl blur opacity-25 group-hover:opacity-75 transition duration-1000 group-hover:duration-200"></div>
+            
+            {/* Logo Box */}
+            {/* <div className="relative w-28 h-28 bg-slate-900 ring-1 ring-slate-800 rounded-2xl flex flex-col items-center justify-center overflow-hidden transition-transform duration-300 group-hover:-translate-y-1"> */}
+              
+              {/* Grid Background inside logo box */}
+              <div className="absolute inset-0 opacity-20" 
+                   style={{backgroundImage: 'radial-gradient(#4f46e5 1px, transparent 1px)', backgroundSize: '8px 8px'}}>
+              </div>
+
+              {/* Icon / Your Logo Image would go here */}
+            <img style={{background:'white', padding:20}} src="https://www.blackleopardtech.com/assets/newLogo-rjLFH8dr.PNG" alt="" srcset="" />
+            {/* </div> */}
+          </div>
+
+          {/* Main Typography */}
+          <div className="space-y-4 max-w-3xl">
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <div className="h-px w-8 bg-slate-700"></div>
+              <span className="text-xs font-bold tracking-[0.2em] text-blue-500 uppercase">
+                Engineering
+              </span>
+              <div className="h-px w-8 bg-slate-700"></div>
+            </div>
+
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white tracking-tight">
+              App Developed by
+              <span className="block mt-2 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 drop-shadow-sm">
+                Blackleopard Tech
+              </span>
+            </h2>
+            
+            <p className="text-slate-400 text-lg md:text-xl max-w-xl mx-auto leading-relaxed pt-4">
+              Building the future of digital experiences with precision, speed, and modern aesthetics.
+            </p>
+          </div>
+
+      
+
+          {/* Optional CTA or Link */}
+          <button onClick={()=> window.open('https://blackleopardtech.com', '_blank')} className="mt-10 group flex items-center gap-2 px-6 py-3 rounded-full bg-slate-900 border border-slate-700 hover:border-slate-500 transition-all text-sm text-slate-300 hover:text-white">
+            <span>Visit Website</span>
+            <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          </button>
+
         </div>
       </div>
     </section>

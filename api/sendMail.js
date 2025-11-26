@@ -9,18 +9,18 @@ export default async function handler(req, res) {
   if (!email) return res.status(400).send("Email required");
 
   const transporter = nodemailer.createTransport({
-    host: "mail.umojamarkets.com",
-    port: 587,
-    secure: false,
+    host: "mail.admitsxtra.com",
+    port: 465,
+    secure: true,
     auth: {
-      user: "noreplay@umojamarkets.com",
-      pass: "vMYHquz9cyBuYkm",
+      user: "support@admitsxtra.com",
+      pass: "icui4cupaaA@bs1@ahm",
     },
   });
 
   try {
     await transporter.sendMail({
-      from: `"Admits Extra" <noreplay@umojamarkets.com>`,
+      from: `"Admits Extra" <support@admitsxtra.com>`,
       to: email,
       subject: "🎉 Welcome to Admits Extra! Your Early Access Awaits",
       html: `

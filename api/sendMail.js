@@ -9,7 +9,7 @@ export default async function handler(req, res) {
   if (!email) return res.status(400).send("Email required");
 
   const transporter = nodemailer.createTransport({
-    host: "mail.admitsxtra.com",
+    host: "smtp.hostinger.com",
     port: 465,
     secure: true,
     auth: {
